@@ -16,3 +16,6 @@
 
 # Ignore eunit test folder
 /.eunit/*
+
+# Ignore rebar3's build directory
+/_build
