@@ -1,4 +1,5 @@
 %% Copyright (c) 2012-2014 Martin Donath <md@struct.cc>
+%%               2018      Bence Golda <bence@cursorinsight.com>
 
 %% Permission is hereby granted, free of charge, to any person obtaining a copy
 %% of this software and associated documentation files (the "Software"), to
@@ -30,12 +31,12 @@
 
 % Start and stop driver.
 setup_and_teardown_test()->
-  { ok, Driver } = gen_driver_test:start_link(),
-  gen_driver_test:stop(Driver).
+  { ok, Pid } = gen_driver_test:start_link(),
+  gen_driver_test:stop(Pid).
 
 % Test the driver for basic functionality.
 basic_test() ->
   { ok, Pid } = gen_driver_test:start_link(),
   { ok, Sum } = gen_driver_test:sum(Pid, [1, 2, 97]),
   ?assertEqual(100.0, Sum),
-  gen_driver_test:stop(Driver).
+  gen_driver_test:stop(Pid).
