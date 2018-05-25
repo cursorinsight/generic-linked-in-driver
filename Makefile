@@ -1,4 +1,5 @@
 # Copyright (c) 2012-2014 Martin Donath <md@struct.cc>
+#               2018      Bence Golda <bence@cursorinsight.com>
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to
@@ -18,12 +19,66 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-all: compile
+# Common developers' settings
+ELVIS_FLAGS := -c $(TOP_DIR)config/elvis.config --output-format plain
 
+# Build tools
+REBAR := $(shell which rebar3)
+ELVIS := $(shell which elvis)
+
+# Common directories and paths
+TOP_DIR := $(dir $(lastword $(MAKEFILE_LIST)))
+BUILD_DIR := $(TOP_DIR)/_build
+
+.PHONY: all deps test
+
+# Default targets
+all: compile
 fresh: clean all
+everything: mrproper compile test
+
+# Check for missing build tools
+ifeq "$(strip $(REBAR))" ""
+REBAR := rebar
+endif
+
+ifeq "$(strip $(ELVIS))" ""
+ELVIS := elvis
+endif
+
+$(REBAR):
+	@echo Please install \`$@\' manually!
+	@exit 1
+
+$(ELVIS):
+	@echo Please install \`$@\' manually!
+	@exit 1
+
+#------------------------------------------------------------------------------
+# Targets
+#------------------------------------------------------------------------------
+
+mrproper:
+	rm -rf $(BUILD_DIR)
 
 clean:
-	./rebar clean
+	$(REBAR) clean
 
-compile:
-	./rebar compile
+deps: $(REBAR)
+	$(REBAR) upgrade
+
+compile: $(REBAR)
+	$(REBAR) compile
+
+test: compile
+	$(REBAR) do eunit, ct, dialyzer
+
+check: $(ELVIS)
+	$(ELVIS) $(ELVIS_FLAGS) rock
+
+shell:
+	$(REBAR) shell
+
+docs: doc
+doc: $(REBAR)
+	$(REBAR) doc
