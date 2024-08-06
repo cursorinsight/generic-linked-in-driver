@@ -37,7 +37,7 @@
 % library associated with the driver, as well as the opened port.
 -record(state, {
   name :: string(),
-  port :: port()
+  port :: port() | undefined
 }).
 
 %% ----------------------------------------------------------------------------
